@@ -390,9 +390,31 @@
 
               <!-- Status Banner -->
               <div class="form-status-banner" id="form-feedback">
-                <strong>Commission request recorded.</strong> Our lead fabricator will contact you via WhatsApp / Phone shortly. You can also send this summary directly via WhatsApp below.
+                <strong>Commission request recorded.</strong> Your enquiry is saved locally as JSON and ready to transmit via Gmail, WhatsApp, or file download.
               </div>
             </form>
+
+            <!-- Client-Side Local Inquiries Ledger (Zero Backend Required) -->
+            <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-subtle);">
+              <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <span class="material-symbols-outlined text-bronze" style="font-size: 1.15rem;">data_object</span>
+                  <span class="text-xs text-bronze tracking-widest font-display">LOCAL INQUIRIES LEDGER (JSON)</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <span class="badge badge-primary" id="json-enquiries-count">0 STORED</span>
+                  <button type="button" class="btn btn-outline btn-sm" onclick="exportAllEnquiriesJSON()" style="padding: 0.35rem 0.65rem; font-size: 0.75rem;">
+                    <span class="material-symbols-outlined" style="font-size: 0.95rem;">download</span> EXPORT ALL (.JSON)
+                  </button>
+                  <button type="button" class="btn btn-ghost btn-sm" onclick="clearEnquiriesJSON()" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" title="Clear local history">
+                    <span class="material-symbols-outlined" style="font-size: 0.95rem;">delete</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- List of stored JSON records rendered via contact.js -->
+              <div id="json-enquiries-list"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -592,14 +614,17 @@
       <button class="modal-close-btn" data-close-modal aria-label="Close modal">
         <span class="material-symbols-outlined">close</span>
       </button>
-      <h3 id="modal-title" style="margin-bottom: 1rem; color: var(--primary);">MODAL TITLE</h3>
-      <div id="modal-body" style="margin-bottom: 1.5rem;"></div>
-      <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
-        <button class="btn btn-ghost btn-sm" data-close-modal>CLOSE</button>
-        <button class="btn btn-primary btn-sm" id="modal-whatsapp-action">
-          <span class="material-symbols-outlined">chat</span>
-          OPEN IN WHATSAPP
-        </button>
+      <h3 id="modal-title">MODAL TITLE</h3>
+      <div id="modal-body"></div>
+      <div class="modal-footer" id="modal-footer-actions">
+        <div class="modal-footer-left" id="modal-footer-left"></div>
+        <div class="modal-footer-right" id="modal-footer-right">
+          <button class="btn btn-ghost btn-sm" data-close-modal>CLOSE</button>
+          <button class="btn btn-primary btn-sm" id="modal-whatsapp-action" style="display: none;">
+            <span class="material-symbols-outlined">chat</span>
+            OPEN IN WHATSAPP
+          </button>
+        </div>
       </div>
     </div>
   </div>

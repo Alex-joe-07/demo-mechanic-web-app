@@ -686,14 +686,17 @@
       <button class="modal-close-btn" data-close-modal aria-label="Close modal">
         <span class="material-symbols-outlined">close</span>
       </button>
-      <h3 id="modal-title" style="margin-bottom: 1rem; color: var(--primary);">MODAL TITLE</h3>
-      <div id="modal-body" style="margin-bottom: 1.5rem;"></div>
-      <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
-        <button class="btn btn-ghost btn-sm" data-close-modal>CLOSE</button>
-        <button class="btn btn-primary btn-sm" id="modal-whatsapp-action">
-          <span class="material-symbols-outlined">chat</span>
-          OPEN IN WHATSAPP
-        </button>
+      <h3 id="modal-title">MODAL TITLE</h3>
+      <div id="modal-body"></div>
+      <div class="modal-footer" id="modal-footer-actions">
+        <div class="modal-footer-left" id="modal-footer-left"></div>
+        <div class="modal-footer-right" id="modal-footer-right">
+          <button class="btn btn-ghost btn-sm" data-close-modal>CLOSE</button>
+          <button class="btn btn-primary btn-sm" id="modal-whatsapp-action" style="display: none;">
+            <span class="material-symbols-outlined">chat</span>
+            OPEN IN WHATSAPP
+          </button>
+        </div>
       </div>
     </div>
   </div>

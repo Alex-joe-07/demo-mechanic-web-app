@@ -42,3 +42,68 @@ window.getWhatsAppLink = function(customText) {
   const text = encodeURIComponent(customText || config.defaultWhatsAppMessage);
   return `https://wa.me/${config.whatsappNumber}?text=${text}`;
 };
+
+/**
+ * Generates a prefilled direct Gmail Web compose link
+ * Opens Gmail in browser with prefilled recipient, subject, and body
+ * @param {string} subject - Email subject line
+ * @param {string} body - Email body content
+ * @returns {string} - Gmail compose URL
+ */
+window.getGmailComposeLink = function(subject, body) {
+  const config = window.ATELIER_CONFIG;
+  const to = encodeURIComponent(config.email);
+  const su = encodeURIComponent(subject || 'New Royal Enfield Custom Build Enquiry');
+  const b = encodeURIComponent(body || '');
+  return `https://mail.google.com/mail/?view=cm&fs=1&to=${to}&su=${su}&body=${b}`;
+};
+
+/**
+ * Generates a standard mailto link
+ */
+window.getMailtoLink = function(subject, body) {
+  const config = window.ATELIER_CONFIG;
+  const to = encodeURIComponent(config.email);
+  const su = encodeURIComponent(subject || 'New Royal Enfield Custom Build Enquiry');
+  const b = encodeURIComponent(body || '');
+  return `mailto:${to}?subject=${su}&body=${b}`;
+};
+
+/**
+ * Client-Side JSON Database helpers (works with zero backend)
+ */
+window.saveEnquiryJSON = function(enquiryObject) {
+  try {
+    const existing = JSON.parse(localStorage.getItem('atelier_enquiries_json') || '[]');
+    existing.unshift(enquiryObject);
+    localStorage.setItem('atelier_enquiries_json', JSON.stringify(existing, null, 2));
+    return true;
+  } catch (err) {
+    console.error('Error saving to localStorage JSON:', err);
+    return false;
+  }
+};
+
+window.getEnquiriesJSON = function() {
+  try {
+    return JSON.parse(localStorage.getItem('atelier_enquiries_json') || '[]');
+  } catch (err) {
+    return [];
+  }
+};
+
+/**
+ * Triggers a client-side .json file download
+ */
+window.downloadJSONFile = function(jsonObject, filename) {
+  const jsonStr = JSON.stringify(jsonObject, null, 2);
+  const blob = new Blob([jsonStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename || `enquiry-${Date.now()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};

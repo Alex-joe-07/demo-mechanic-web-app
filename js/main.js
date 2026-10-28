@@ -134,21 +134,88 @@ function initDemoModal() {
     }
   });
 
-  // Expose helper to show modal globally
-  window.showAtelierModal = function(title, contentHtml, whatsappText) {
+  // Expose helper to show modal globally with flexible action buttons
+  window.showAtelierModal = function(title, contentHtml, options) {
     const modalTitle = modalOverlay.querySelector('#modal-title');
     const modalBody = modalOverlay.querySelector('#modal-body');
     const modalAction = modalOverlay.querySelector('#modal-whatsapp-action');
+    const footerLeft = modalOverlay.querySelector('#modal-footer-left');
+    const footerRight = modalOverlay.querySelector('#modal-footer-right') || modalAction?.parentElement;
 
     if (modalTitle) modalTitle.textContent = title;
     if (modalBody) modalBody.innerHTML = contentHtml;
-    if (modalAction && whatsappText) {
-      modalAction.onclick = () => {
-        window.open(window.getWhatsAppLink(whatsappText), '_blank');
-      };
-      modalAction.style.display = 'inline-flex';
-    } else if (modalAction) {
-      modalAction.style.display = 'none';
+
+    // Reset dynamic buttons and footer containers
+    modalOverlay.querySelectorAll('.dynamic-modal-btn').forEach(btn => btn.remove());
+    if (footerLeft) footerLeft.innerHTML = '';
+    if (modalAction) modalAction.style.display = 'none';
+
+    if (typeof options === 'string') {
+      // Legacy backwards-compatible string = WhatsApp single action
+      if (modalAction) {
+        modalAction.onclick = () => window.open(window.getWhatsAppLink(options), '_blank');
+        modalAction.style.display = 'inline-flex';
+        modalAction.innerHTML = '<span class="material-symbols-outlined">chat</span> OPEN IN WHATSAPP';
+      }
+    } else if (options && typeof options === 'object') {
+      // 1. JSON Utilities (Download & Copy) -> placed in modal-footer-left
+      if (options.json && footerLeft) {
+        const jsonBtn = document.createElement('button');
+        jsonBtn.type = 'button';
+        jsonBtn.className = 'btn btn-ghost btn-sm dynamic-modal-btn';
+        jsonBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 1rem;">download</span> DOWNLOAD JSON';
+        jsonBtn.onclick = () => {
+          window.downloadJSONFile(options.json.data, options.json.filename);
+        };
+        footerLeft.appendChild(jsonBtn);
+
+        const copyBtn = document.createElement('button');
+        copyBtn.type = 'button';
+        copyBtn.className = 'btn btn-ghost btn-sm dynamic-modal-btn';
+        copyBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 1rem;">content_copy</span> COPY JSON';
+        copyBtn.onclick = () => {
+          const textToCopy = JSON.stringify(options.json.data, null, 2);
+          navigator.clipboard.writeText(textToCopy)
+            .then(() => {
+              copyBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 1rem; color: var(--primary);">check</span> COPIED!';
+              setTimeout(() => {
+                copyBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 1rem;">content_copy</span> COPY JSON';
+              }, 2000);
+            })
+            .catch(() => {
+              copyBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 1rem; color: var(--primary);">check</span> COPIED!';
+            });
+        };
+        footerLeft.appendChild(copyBtn);
+      }
+
+      // Check if primary actions are already placed in modalBody
+      const hasGmailInBody = modalBody && modalBody.querySelector('#btn-modal-gmail');
+      const hasWaInBody = modalBody && modalBody.querySelector('#btn-modal-whatsapp');
+
+      // 2. Fallback buttons in footerRight if not embedded in modal body
+      if (!hasWaInBody && options.whatsappText && footerRight) {
+        const waBtn = document.createElement('button');
+        waBtn.type = 'button';
+        waBtn.className = 'btn btn-outline btn-sm dynamic-modal-btn';
+        waBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 1rem;">chat</span> SEND WHATSAPP';
+        waBtn.onclick = () => {
+          window.open(window.getWhatsAppLink(options.whatsappText), '_blank');
+        };
+        footerRight.insertBefore(waBtn, footerRight.firstChild);
+      }
+
+      if (!hasGmailInBody && options.gmail && footerRight) {
+        const gmailBtn = document.createElement('button');
+        gmailBtn.type = 'button';
+        gmailBtn.className = 'btn btn-primary btn-sm dynamic-modal-btn';
+        gmailBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 1rem;">mail</span> SEND VIA GMAIL';
+        gmailBtn.onclick = () => {
+          const url = window.getGmailComposeLink(options.gmail.subject, options.gmail.body);
+          window.open(url, '_blank');
+        };
+        footerRight.insertBefore(gmailBtn, footerRight.firstChild);
+      }
     }
 
     modalOverlay.classList.add('open');
